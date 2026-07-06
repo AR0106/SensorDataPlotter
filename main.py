@@ -173,22 +173,19 @@ def collect_data(data: str):
     print(f"Connected to {port} at {baud} baud rate...")
 
     with open(f"data-{data}-{time.time()}.csv", "w") as file:
-        file.write("accelX,accelY,accelZ\n")
+        file.write("dataType,accelX,accelY,accelZ\n")
 
-        lineCount = 0
+        dataType = 0
         if data == "gyro":
-            lineCount = 1
+            dataType = 1
 
         try:
             while True:
                 if ser.in_waiting > 0:
                     line = ser.readline().decode("utf-8").rstrip()
 
-                    if lineCount % 2 == 0:
-                        parts = line.split("\t")
-                        file.write(",".join(parts[1:]) + "\n")
-
-                    lineCount += 1
+                    if line.startswith(str(dataType)):
+                        file.write(line + "\n")
 
         except KeyboardInterrupt:
             print("Exiting...")
